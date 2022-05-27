@@ -373,6 +373,7 @@ def main():
     particlefilter = particleFilter(video_input)
     particlefilter.set_video_dimensions(particlefilter.getVideoName())
     particles = particlefilter.initialize_particles()
+    video_frames = []
     for frame in particlefilter.get_frames(particlefilter.getVideoName()):
         if frame is None: 
             break
@@ -394,9 +395,16 @@ def main():
         alpha = 0.4 
         
         image_new = cv2.addWeighted(overlay, alpha, frame, 1 - alpha, 0)
+        video_frames.append(image_new)
         terminate = particlefilter.displayFrame(image_new,particles,location)
         if terminate:
             break
+        
+    writer = cv2.VideoWriter_fourcc(*'mp4v') 
+    video = cv2.VideoWriter('output.mp4', writer, 15, (particlefilter.getWidth(), particlefilter.getHeight()))
+    for frame in video_frames:
+        video.write(frame)
+    video.release()
     cv2.destroyAllWindows()
 
 main()
